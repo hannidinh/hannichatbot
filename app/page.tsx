@@ -3,10 +3,23 @@ import Image from "next/image"
 import hannilogo from "./assets/hannilogo.png"
 import { useChat } from "ai/react"
 import { Message } from "ai"
+import Bubble from "./components/Bubble"
+import LoadingBubble from "./components/LoadingBubble"
+import PromptSuggestionsRow from "./components/PromptSuggestionsRow"
 
 const Home = () => {
     const { append, isLoading, messages, input, handleInputChange, handleSubmit } = useChat()
-    const noMessages = true
+    const noMessages = !messages || messages.length === 0
+
+    const handlePrompt = (promptText) => {
+        const msg: Message = {
+            id: crypto.randomUUID(),
+            content: promptText,
+            role: "user"
+        }
+        append(msg)
+    }
+
     return (
         <main>
             <Image src={hannilogo} width="250" alt="Hanni gpt logo" />
@@ -17,12 +30,12 @@ const Home = () => {
                             Ask me anything about me. I hope you enjoy.
                         </p>
                         <br />
-                        {/* <PromptSuggestionRow/> */}
+                        <PromptSuggestionsRow onPromptClick={handlePrompt} />
                     </>
                 ) : (
                     <>
-                        {/* map messages onto text bubbles */}
-                        {/* <LoadingBubble /> */}
+                        {messages.map((message, index) => <Bubble key={`message-${index}`} message={message} />)}
+                        {isLoading && <LoadingBubble />}
                     </>
                 )}
 
